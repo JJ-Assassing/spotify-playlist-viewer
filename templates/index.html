@@ -1,11 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Spotify Viewer</title>
-  <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Spotify Playlist Viewer</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <h1>Spotify Playlist Viewer</h1>
-  <script src="/static/main.js"></script>
+    <h1>Spotify Playlist Viewer</h1>
+
+    {% if playlists %}
+        <h2>Tus Playlists</h2>
+        <ul>
+            {% for playlist in playlists %}
+                <li><a href="{{ playlist.url }}" target="_blank">{{ playlist.name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <a href="/login" class="btn">Iniciar sesión con Spotify</a>
+    {% endif %}
+
+    <script src="/static/main.js"></script>
 </body>
 </html>
