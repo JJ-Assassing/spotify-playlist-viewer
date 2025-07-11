@@ -1,2 +1,3 @@
-# spotify-playlist-viewer
-App web que muestra playlists y canciones usando la API de Spotify
+# Spotify Playlist Viewer
+
+Proyecto web que muestra tus playlists de Spotify usando HTML/CSS/JS y Flask + Spotipy (Python).
