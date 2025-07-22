@@ -1,59 +1,51 @@
-from flask import Flask, redirect, request, session, url_for, render_template
+from flask import Flask, request, redirect, session, render_template
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 app = Flask(__name__)
-app.secret_key = "juan_mi_clave_secreta_segura_2025"  # Clave
+app.secret_key = "clave-secreta"  # Cámbiala por seguridad
 
-# Configuración de Spotify
-SPOTIPY_CLIENT_ID =3 "2d71154243c54cc7a11bdfd0e1c577df"
-SPOTIPY_CLIENT_SECRET = "1338c63f5c3a4a6aa6ef5fb57674907e"
-SPOTIPY_REDIRECT_URI = "https://localhost:5000/callback"
+# ⚙️ Configuración de tu app de Spotify
+CLIENT_ID = "TU_CLIENT_ID"
+CLIENT_SECRET = "TU_CLIENT_SECRET"
+REDIRECT_URI = "http://localhost:8888/callback"
 
-SCOPE = "user-library-read playlist-read-private"
+SCOPE = "user-read-playback-state user-modify-playback-state user-read-currently-playing streaming"
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/login')
+@app.route("/login")
 def login():
-    sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
-                            client_secret=SPOTIPY_CLIENT_SECRET,
-                            redirect_uri=SPOTIPY_REDIRECT_URI,
+    sp_oauth = SpotifyOAuth(client_id=CLIENT_ID,
+                            client_secret=CLIENT_SECRET,
+                            redirect_uri=REDIRECT_URI,
                             scope=SCOPE)
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
-@app.route('/callback')
+@app.route("/callback")
 def callback():
-    sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
-                            client_secret=SPOTIPY_CLIENT_SECRET,
-                            redirect_uri=SPOTIPY_REDIRECT_URI,
+    sp_oauth = SpotifyOAuth(client_id=CLIENT_ID,
+                            client_secret=CLIENT_SECRET,
+                            redirect_uri=REDIRECT_URI,
                             scope=SCOPE)
-    session.clear()
-    code = request.args.get('code')
+    code = request.args.get("code")
     token_info = sp_oauth.get_access_token(code)
     session["token_info"] = token_info
-    return redirect(url_for('playlists'))
+    return redirect("/player")
 
-@app.route('/playlists')
-def playlists():
+@app.route("/token")
+def get_token():
     token_info = session.get("token_info", None)
     if not token_info:
-        return redirect(url_for("login"))
+        return {"error": "No token"}
+    return {"access_token": token_info["access_token"]}
 
-    sp = spotipy.Spotify(auth=token_info['access_token'])
-    results = sp.current_user_playlists()
+@app.route("/player")
+def player():
+    return render_template("player.html")
 
-    playlists = []
-    for item in results['items']:
-        playlists.append({
-            'name': item['name'],
-            'url': item['external_urls']['spotify']
-        })
-
-    return render_template('index.html', playlists=playlists)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(port=8888, debug=True)
