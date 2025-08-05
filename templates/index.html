@@ -23,8 +23,8 @@
         </nav>
         
         <div class="search-container">
-            <form action="#" method="get">
-                <input type="text" placeholder="Buscar artistas o canciones..." name="search" class="search-input">
+            <form id="searchForm" class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar canción o artista..." />
                 <button type="submit" class="search-button">Buscar</button>
             </form>
         </div>
@@ -50,6 +50,9 @@
             <!-- 🔊 Contenedor del reproductor (cargaremos con JS) -->
             <div id="player"></div>
         </section>
+
+        <!-- 🔍 Resultados de búsqueda dinámicos -->
+        <div id="results" class="main-flex"></div>
     </main>
 
     <footer class="footer">
@@ -58,7 +61,7 @@
         </div>
     </footer>
 
-<script src="app.js"></script>
-
+    <!-- 📜 Script principal -->
+    <script src="app.js"></script>
 </body>
 </html>
