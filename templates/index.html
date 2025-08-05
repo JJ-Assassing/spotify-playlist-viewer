@@ -29,21 +29,49 @@
             </form>
         </div>
     </header>
-        <main class="main-flex">
+
+    <main class="main-flex">
         <section class="card">
-           <h1>TOP 5 CANCIONES POPULAR</h1>
+            <h1>TOP 5 CANCIONES POPULARES</h1>
+            <!-- Aquí puedes insertar dinámicamente resultados en el futuro -->
         </section>
+
         <section class="card">
             <h1>ARTISTA</h1>
         </section>
+
         <section class="card">
-          <h1>PLAY LIST</h1> 
+            <h1>PLAY LIST</h1> 
+            <!-- 🔵 Botón para iniciar sesión con Spotify -->
+            <a href="/login" class="spotify-button">
+                <i class="fab fa-spotify"></i> Iniciar sesión con Spotify
+            </a>
+
+            <!-- 🔊 Contenedor del reproductor (cargaremos con JS) -->
+            <div id="player"></div>
         </section>
     </main>
-        <footer class="footer">
+
+    <footer class="footer">
         <div class="footer-bottom">
             <p>FJ MUSIC</p>
         </div>
     </footer>
+
+    <script>
+        // Este JS cargará el token cuando estés logueado
+        fetch('/token')
+            .then(res => res.json())
+            .then(data => {
+                if (data.access_token) {
+                    console.log("🎧 Token cargado con éxito");
+                    // Aquí más adelante se cargará el reproductor Web Playback SDK
+                    // Por ahora solo mostramos un mensaje
+                    document.getElementById("player").innerText = "✅ Conectado a Spotify";
+                } else {
+                    console.log("❌ No autorizado");
+                }
+            });
+    </script>
 </body>
 </html>
