@@ -1,51 +1,46 @@
-from flask import Flask, request, redirect, session, render_template
+from flask import Flask, request, jsonify
+from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
+import os
+
+# Cargar variables de entorno
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "clave-secreta"  # Cámbiala por seguridad
 
-# ⚙️ Configuración de tu app de Spotify
-CLIENT_ID = "TU_CLIENT_ID"
-CLIENT_SECRET = "TU_CLIENT_SECRET"
-REDIRECT_URI = "http://localhost:8888/callback"
+# Autenticación con Spotify
+client_credentials_manager = SpotifyClientCredentials(
+    client_id=os.getenv("SPOTIPY_CLIENT_ID"),
+    client_secret=os.getenv("SPOTIPY_CLIENT_SECRET")
+)
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-SCOPE = "user-read-playback-state user-modify-playback-state user-read-currently-playing streaming"
+# Ruta raíz
+@app.route('/')
+def home():
+    return "API de FJ MUSIC funcionando correctamente."
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+# Ruta de búsqueda
+@app.route('/search')
+def search():
+    query = request.args.get('query', '')
+    if not query:
+        return jsonify({'error': 'Falta el parámetro "query".'}), 400
 
-@app.route("/login")
-def login():
-    sp_oauth = SpotifyOAuth(client_id=CLIENT_ID,
-                            client_secret=CLIENT_SECRET,
-                            redirect_uri=REDIRECT_URI,
-                            scope=SCOPE)
-    auth_url = sp_oauth.get_authorize_url()
-    return redirect(auth_url)
+    results = sp.search(q=query, type='track', limit=5)
+    canciones = []
 
-@app.route("/callback")
-def callback():
-    sp_oauth = SpotifyOAuth(client_id=CLIENT_ID,
-                            client_secret=CLIENT_SECRET,
-                            redirect_uri=REDIRECT_URI,
-                            scope=SCOPE)
-    code = request.args.get("code")
-    token_info = sp_oauth.get_access_token(code)
-    session["token_info"] = token_info
-    return redirect("/player")
+    for item in results['tracks']['items']:
+        canciones.append({
+            'nombre': item['name'],
+            'artista': item['artists'][0]['name'],
+            'imagen': item['album']['images'][0]['url'],
+            'preview': item['preview_url'],
+            'spotify_url': item['external_urls']['spotify']
+        })
 
-@app.route("/token")
-def get_token():
-    token_info = session.get("token_info", None)
-    if not token_info:
-        return {"error": "No token"}
-    return {"access_token": token_info["access_token"]}
+    return jsonify(canciones)
 
-@app.route("/player")
-def player():
-    return render_template("player.html")
-
-if __name__ == "__main__":
-    app.run(port=8888, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
