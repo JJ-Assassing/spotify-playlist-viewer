@@ -58,20 +58,7 @@
         </div>
     </footer>
 
-    <script>
-        // Este JS cargará el token cuando estés logueado
-        fetch('/token')
-            .then(res => res.json())
-            .then(data => {
-                if (data.access_token) {
-                    console.log("🎧 Token cargado con éxito");
-                    // Aquí más adelante se cargará el reproductor Web Playback SDK
-                    // Por ahora solo mostramos un mensaje
-                    document.getElementById("player").innerText = "✅ Conectado a Spotify";
-                } else {
-                    console.log("❌ No autorizado");
-                }
-            });
-    </script>
+<script src="app.js"></script>
+
 </body>
 </html>
